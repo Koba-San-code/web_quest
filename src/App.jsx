@@ -1,6 +1,6 @@
 import React from 'react';
-import Globe from './components/globe';
-import Map from './components/map';
+import Globe from './components/Globe'; // Правильный регистр имени файла
+import Map from './components/Map';   // Правильный регистр имени файла
 
 const App = () => {
   return (

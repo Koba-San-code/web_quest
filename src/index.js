@@ -1,13 +1,14 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
 import './styles/main.css';
-import { initMap } from './components/map';
-import { initGlobe } from './components/globe';
 
-// ...existing code...
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Web Quest initialized.');
-  
-  // Инициализация компонентов
-  initGlobe();
-  initMap();
-});
-// ...existing code...
+// Инициализируем приложение React вместо прямой инициализации компонентов
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+console.log('Web Quest initialized.');

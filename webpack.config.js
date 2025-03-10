@@ -2,14 +2,16 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.jsx', // изменили точку входа
+  entry: './src/index.js', // Изменено с index.jsx на index.js для соответствия файлу
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true
   },
-  resolve: { // добавлено для поддержки jsx
-    extensions: ['.js', '.jsx']
+  resolve: { 
+    extensions: ['.js', '.jsx'],
+    // Добавим более строгое разрешение имен файлов
+    enforceExtension: false
   },
   module: {
     rules: [
@@ -35,7 +37,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './public/index.html'
+      template: './public/index.html',
+      filename: 'index.html'
     })
   ],
   devServer: {
@@ -44,6 +47,10 @@ module.exports = {
     },
     compress: true,
     port: 3000,
-    hot: true
+    hot: true,
+    // Перезагружать страницу при ошибках импорта
+    client: {
+      overlay: true
+    }
   }
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { initMap, addMapMarker } from './map';
+import { initMap, addMapMarker } from './Map';
 
 const Map = () => {
   const [map, setMap] = useState(null);
