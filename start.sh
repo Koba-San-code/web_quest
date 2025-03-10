@@ -10,7 +10,7 @@ npm install -D webpack-cli
 
 # Запуск сборки
 echo "Запуск сборки..."
-npm run build
+npx webpack --mode production
 
 # Запуск сервера
 echo "Запуск сервера..."

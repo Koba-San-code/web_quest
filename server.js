@@ -3,7 +3,7 @@ try {
   const path = require('path');
   const fs = require('fs');
   const app = express();
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 10000;
 
   // Проверка наличия каталога dist
   if (!fs.existsSync(path.join(__dirname, 'dist'))) {
@@ -39,6 +39,11 @@ try {
     }
   }
 
+  // Логи для отладки на Render
+  console.log(`Рабочий каталог: ${__dirname}`);
+  console.log(`Файлы в dist: ${fs.existsSync(path.join(__dirname, 'dist')) ? 
+    fs.readdirSync(path.join(__dirname, 'dist')).join(', ') : 'папка не существует'}`);
+
   // Обслуживаем статические файлы из папки dist
   app.use(express.static(path.join(__dirname, 'dist')));
 
@@ -50,7 +55,7 @@ try {
   // Запускаем сервер
   app.listen(port, () => {
     console.log(`Web Quest сервер запущен на порту ${port}`);
-    console.log(`Откройте http://localhost:${port} в браузере`);
+    console.log(`Открыт для доступа на https://hello-earth-meet-with-anon.onrender.com`);
   });
 } catch (error) {
   console.error('Критическая ошибка при запуске сервера:', error);
