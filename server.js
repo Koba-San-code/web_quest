@@ -1,14 +1,41 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Проверка наличия каталога dist
-const fs = require('fs');
 if (!fs.existsSync(path.join(__dirname, 'dist'))) {
-  console.error('Ошибка: Каталог dist не найден!');
-  console.log('Необходимо сначала собрать приложение командой npm run build');
-  process.exit(1);
+  console.log('Каталог dist не найден. Создание базового HTML...');
+  try {
+    fs.mkdirSync(path.join(__dirname, 'dist'), { recursive: true });
+    
+    const fallbackHtml = `
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Quest</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            .container { max-width: 800px; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Web Quest</h1>
+            <p>Приложение запускается. Если эта страница не обновляется, возможно, возникли проблемы при сборке.</p>
+        </div>
+    </body>
+    </html>
+    `;
+    
+    fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), fallbackHtml);
+    console.log('Базовый HTML-файл создан.');
+  } catch (err) {
+    console.error('Ошибка при создании базового HTML:', err);
+  }
 }
 
 // Обслуживаем статические файлы из папки dist
