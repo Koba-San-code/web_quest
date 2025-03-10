@@ -35,16 +35,17 @@ const fallbackHtml = `
 fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), fallbackHtml);
 
 try {
+  // Устанавливаем webpack-cli без интерактивных запросов
+  console.log('Установка webpack-cli...');
+  execSync('npm install -D webpack-cli --no-save --quiet', { stdio: 'inherit' });
+  
+  // Убедимся что основные зависимости установлены
+  console.log('Установка основных зависимостей...');
+  execSync('npm install express leaflet react react-dom three --no-save --quiet', { stdio: 'inherit' });
+  
   // Запускаем webpack с явным указанием пути к webpack-cli
   console.log('Запуск сборки проекта...');
-  const webpackPath = path.join(__dirname, 'node_modules', '.bin', 'webpack');
-  
-  if (fs.existsSync(webpackPath)) {
-    execSync(`${webpackPath} --mode production`, { stdio: 'inherit' });
-  } else {
-    // Если локального webpack не обнаружено, используем npx
-    execSync('npx webpack --mode production', { stdio: 'inherit' });
-  }
+  execSync('npx webpack --mode production --no-stats', { stdio: 'inherit' });
   
   console.log('Сборка проекта успешно завершена');
 } catch (error) {

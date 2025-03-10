@@ -4,13 +4,14 @@
   "description": "Экспериментальный веб-сайт для анонимной отправки сообщений и меток на карте.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "npm install --production --quiet && node server.js",
     "dev": "webpack serve --mode development --open",
     "build": "node render.js",
     "deploy": "node deploy.js",
     "test": "jest",
     "lint": "eslint src/**/*.js",
-    "preinstall": "npm install -D webpack-cli --no-save"
+    "preinstall": "npm install -D webpack-cli --no-save",
+    "render": "bash start.sh"
   },
   "author": "",
   "license": "MIT",
@@ -37,4 +38,3 @@
     "webpack-dev-server": "^4.15.1"
   }
 }
-
