@@ -85,11 +85,11 @@ npm install
 #### Создание файла .env
 
 Создайте файл `.env` в корневом каталоге проекта со следующим содержимым:
-
+```bash
 MONGODB_URI=mongodb://localhost:27017/web_quest
 PORT=10000
 NODE_ENV=development
-
+```
 ## Конфигурация
 
 Настройки хранятся в файле `.env`:
@@ -100,8 +100,9 @@ NODE_ENV=development
 
 #### Создание файла .npmrc (опционально)
 Если у вас возникают проблемы с установкой зависимостей, создайте файл `.npmrc` в корневом каталоге с настройками:
-
+```bash
 ## Основные настройки
+
 fund=false
 audit=false
 loglevel=error
@@ -116,7 +117,7 @@ network-timeout=60000
 
 save-exact=true
 engine-strict=false
-
+```
 
 #### 4. Настройка MongoDB (опционально)
 Если вы хотите использовать MongoDB для хранения данных:
