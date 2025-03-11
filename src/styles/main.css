@@ -1,50 +1,778 @@
-body {
-  font-family: 'Roboto', Arial, sans-serif;
+:root {
+  --bg-color: #f5f7fa;
+  --container-bg: #ffffff;
+  --text-color: #333333;
+  --accent-color: #3f51b5;
+  --accent-hover: #303f9f;
+  --border-color: #e0e0e0;
+  --error-color: #f44336;
+  --success-color: #4caf50;
+  --header-bg: #3f51b5;
+  --header-text: #ffffff;
+  --footer-bg: #2c3e50;
+  --footer-text: #ecf0f1;
+}
+
+* {
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5;
-  color: #333;
+  box-sizing: border-box;
 }
 
-.container {
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* App Container Styles */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.app-header {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.app-header nav {
+  margin-top: 1rem;
+}
+
+.app-header ul {
+  display: flex;
+  list-style: none;
+  gap: 1rem;
+}
+
+.app-header button {
+  background: transparent;
+  border: none;
+  color: var(--header-text);
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.app-header button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-header button.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+/* Main Content Styles */
+main {
+  flex: 1;
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
 }
 
-.globe-container {
-  width: 100%;
-  height: 500px;
-  margin: 20px 0;
+section {
+  background-color: var(--container-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+section h2 {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+/* Map Styles */
+.map-outer-container {
+  position: relative;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #000;
+  height: 500px; /* Явно устанавливаем высоту контейнера */
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.map-container-wrapper {
+  position: relative;
+  height: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .map-container {
   width: 100%;
-  height: 400px;
-  margin: 20px 0;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  z-index: 1; /* Предотвращает проблемы с z-index в Leaflet */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  height: 100%; /* 100% высоты родителя */
+  position: absolute; /* Абсолютное позиционирование */
+  top: 0;
+  left: 0;
 }
 
-/* Стили для добавления меток */
-.marker-form {
-  margin-top: 10px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.map-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.message-form {
-  margin: 20px 0;
+.locate-button {
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 0.9rem;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.3s;
+}
+
+.locate-button:before {
+  content: "📍";
+  font-size: 1.1em;
+}
+
+.locate-button:hover {
+  background-color: var(--accent-hover);
+}
+
+.locate-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.locate-button.locating:before {
+  content: "🔄";
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.location-error {
+  margin-top: 8px;
+  background-color: rgba(244, 67, 54, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  max-width: 250px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Стиль для информации о местоположении */
+.location-info {
+  margin-top: 8px;
+  background-color: rgba(76, 175, 80, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  max-width: 250px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Custom Map Marker Styles */
+.custom-map-marker {
+  background: transparent;
+}
+
+.marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--accent-color);
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -15px 0 0 -15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.marker-pin::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  margin: 5px 0 0 5px;
+  background: white;
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Pulse icon for geolocation */
+.pulse-icon .pulse-circle {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(66, 133, 244, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(66, 133, 244, 0.4);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4);
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 15px rgba(66, 133, 244, 0);
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0);
+  }
+}
+
+/* Стили для перемещаемых маркеров */
+.marker-pin.draggable {
+  background: var(--accent-hover);
+  border: 2px solid white;
+  cursor: move;
+  animation: pulse-draggable 1.5s infinite;
+}
+
+@keyframes pulse-draggable {
+  0% {
+    transform: rotate(-45deg) scale(1);
+  }
+  50% {
+    transform: rotate(-45deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(-45deg) scale(1);
+  }
+}
+
+/* Стили для модального окна с ключом доступа */
+.key-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.key-modal {
+  background-color: var(--container-bg);
   padding: 20px;
-  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.key-modal h3 {
+  margin-top: 0;
+  color: var(--accent-color);
+}
+
+.key-input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.key-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-button {
+  background-color: #e0e0e0;
+  color: var(--text-color);
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: #d0d0d0;
+}
+
+/* Стили для кнопок управления */
+.access-key-button {
+  background-color: #f39c12;
+  color: white;
+  font-size: 0.9rem;
+  padding: 10px 15px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+}
+
+.access-key-button.active {
+  background-color: #27ae60;
+}
+
+.access-key-button:before {
+  content: "🔑";
+  font-size: 1.1em;
+  margin-right: 5px;
+}
+
+.help-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--accent-color);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.access-key-help {
+  position: absolute;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  bottom: 140px;
+  right: 10px;
+  max-width: 300px;
+  z-index: 1000;
+}
+
+.access-key-help p {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.close-help-button {
+  background-color: #ddd;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  float: right;
+  margin-top: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Стили для формы добавления метки */
+.marker-form-popup {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+}
+
+.marker-form-popup h3 {
+  margin-top: 0;
+  color: var(--accent-color);
+  margin-bottom: 15px;
+}
+
+.marker-popup-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  min-height: 80px;
+}
+
+.marker-popup-form textarea:focus {
+  border-color: var(--accent-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.marker-form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.marker-submit-button {
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 0.9rem;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.marker-cancel-button {
+  background-color: #e0e0e0;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.marker-submit-button:hover {
+  background-color: var(--accent-hover);
+}
+
+.marker-cancel-button:hover {
+  background-color: #d0d0d0;
+}
+
+/* Стили для контрола подтверждения позиции маркера */
+.marker-confirm-container {
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.marker-confirm-button {
+  background-color: var(--success-color);
+  color: white;
+  font-size: 1rem;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.marker-confirm-button:hover {
+  background-color: #3d9140;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+.marker-confirm-icon {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Message Form Styles */
+.message-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: white;
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.3s;
+}
+
+textarea:focus {
+  border-color: var(--accent-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.submit-button {
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: var(--accent-hover);
+}
+
+.submit-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* About Section Styles */
+.about-content {
+  line-height: 1.8;
+}
+
+.about-content ul {
+  margin: 1rem 0 1rem 1.5rem;
+}
+
+.about-content p {
+  margin-bottom: 1rem;
+}
+
+/* Error Message Styles */
+.error-message {
+  color: var(--error-color);
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+/* Footer Styles */
+.app-footer {
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1rem;
+  }
+  
+  main {
+    padding: 1rem;
+  }
+  
+  .app-header ul {
+    flex-wrap: wrap;
+  }
+  
+  .map-container-wrapper {
+    height: 400px;
+  }
+  
+  .map-outer-container {
+    height: 400px;
+  }
+  
+  .marker-form-popup {
+    max-width: 90%;
+    padding: 15px;
+  }
+  
+  .access-key-help {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .app-header button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  section {
+    padding: 1rem;
+  }
+  
+  .map-container-wrapper {
+    height: 300px;
+  }
+  
+  .map-outer-container {
+    height: 300px;
+  }
+  
+  .map-controls {
+    gap: 8px;
+  }
+  
+  .locate-button, .access-key-button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .marker-confirm-container {
+    bottom: 100px;
+  }
+  
+  .marker-confirm-button {
+    font-size: 0.9rem;
+    padding: 8px 14px;
+  }
+  
+  .location-info {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    max-width: 200px;
+  }
+}
+
+/* Подсказка с тестовым ключом */
+.universal-key-hint {
+  background-color: #fffde7;
+  padding: 8px;
+  margin: 10px 0;
+  border-left: 3px solid #fdd835;
+  font-size: 0.9rem;
+  color: #5d4037;
+}
+
+.universal-key-hint em {
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Стили для кнопки "Указать на карте" */
+.point-on-map-button {
+  background-color: #9C27B0;
+  color: white;
+  font-size: 0.9rem;
+  padding: 10px 15px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+}
+
+.point-on-map-button:before {
+  content: "🎯";
+  font-size: 1.1em;
+  margin-right: 5px;
+}
+
+.point-on-map-button.active {
+  background-color: #7B1FA2;
+  animation: pulse-button 2s infinite;
+  font-weight: bold;
+}
+
+@keyframes pulse-button {
+  0% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(156, 39, 176, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0); }
+}
+
+/* Стили для визуальной подсказки режима указания */
+.pointing-mode-help {
+  position: absolute;
+  top: 70px; /* Располагаем чуть ниже, чтобы не перекрывать другие элементы */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1090; /* Высокий z-index чтобы отображаться поверх карты */
+  pointer-events: none; /* Не мешаем кликам */
+  width: auto;
+  max-width: 90%;
+}
+
+.help-toast {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  animation: pulse-help 2s infinite;
+  white-space: nowrap;
+  border: 1px solid rgba(156, 39, 176, 0.5);
+}
+
+@keyframes pulse-help {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(156, 39, 176, 0.7); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(156, 39, 176, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(156, 39, 176, 0); }
+}
+
+/* Удаляем неиспользуемые стили для "Поставить здесь" */
+/* Удаляем стили .place-here-container, .place-here-button и т.д. */
+
+/* Стили для центральной метки */
+.marker-pin.center-fixed {
+  background: #FF5722;
+  border: 2px solid white;
+  animation: pulse-center 1.5s infinite;
+  z-index: 1000;
+}
+
+@keyframes pulse-center {
+  0% {
+    transform: rotate(-45deg) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: rotate(-45deg) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-45deg) scale(1);
+    opacity: 0.8;
+  }
 }

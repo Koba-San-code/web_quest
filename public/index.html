@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Quest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Web Quest - Исследуй мир вместе с нами</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+    <style>
+        /* Критические стили для Leaflet */
+        .leaflet-container {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .map-outer-container {
+            position: relative;
+            height: 500px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
-    <!-- Удаляем ссылку на index.js, так как webpack сам добавит нужные скрипты -->
 </body>
 </html>

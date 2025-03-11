@@ -1,70 +1,44 @@
+require('dotenv').config();
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const cors = require('cors');
+const app = express();
+const port = process.env.PORT || 10000;
+
+// Включаем CORS для разработки
+app.use(cors());
+
+// Настройка парсинга JSON
+app.use(express.json());
+
+// Попытка подключения к MongoDB
+let mongoose, connectDB, Message, Marker;
 try {
-  const express = require('express');
-  const path = require('path');
-  const fs = require('fs');
-  const app = express();
-  const port = process.env.PORT || 10000;
-
-  // Проверка наличия каталога dist
-  if (!fs.existsSync(path.join(__dirname, 'dist'))) {
-    console.log('Каталог dist не найден. Создание базового HTML...');
-    try {
-      fs.mkdirSync(path.join(__dirname, 'dist'), { recursive: true });
-      
-      const fallbackHtml = `
-      <!DOCTYPE html>
-      <html lang="ru">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Web Quest</title>
-          <style>
-              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-              .container { max-width: 800px; margin: 0 auto; }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <h1>Web Quest</h1>
-              <p>Приложение запускается. Если эта страница не обновляется, возможно, возникли проблемы при сборке.</p>
-          </div>
-      </body>
-      </html>
-      `;
-      
-      fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), fallbackHtml);
-      console.log('Базовый HTML-файл создан.');
-    } catch (err) {
-      console.error('Ошибка при создании базового HTML:', err);
-    }
-  }
-
-  // Логи для отладки на Render
-  console.log(`Рабочий каталог: ${__dirname}`);
-  console.log(`Файлы в dist: ${fs.existsSync(path.join(__dirname, 'dist')) ? 
-    fs.readdirSync(path.join(__dirname, 'dist')).join(', ') : 'папка не существует'}`);
-
-  // Обслуживаем статические файлы из папки dist
-  app.use(express.static(path.join(__dirname, 'dist')));
-
-  // Для всех запросов возвращаем index.html
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-  });
-
-  // Запускаем сервер
-  app.listen(port, () => {
-    console.log(`Web Quest сервер запущен на порту ${port}`);
-    console.log(`Открыт для доступа на https://hello-earth-meet-with-anon.onrender.com`);
-  });
-} catch (error) {
-  console.error('Критическая ошибка при запуске сервера:', error);
-  console.log('Создаем простой сервер на http...');
+  mongoose = require('mongoose');
+  connectDB = require('./db/mongo');
   
-  // Резервный сервер на случай отсутствия Express
-  const http = require('http');
-  const fs = require('fs');
-  const path = require('path');
+  if (process.env.NODE_ENV !== 'test') {
+    connectDB()
+      .then(() => console.log('MongoDB подключена успешно'))
+      .catch(err => console.error('Ошибка подключения к MongoDB:', err));
+  }
+  
+  // Загружаем модели для MongoDB
+  Message = require('./models/Message');
+  Marker = require('./models/Marker');
+} catch (err) {
+  console.log('Работаем без MongoDB, используем in-memory хранилище');
+}
+
+// In-memory хранение для демонстрации
+const messages = [];
+const markers = [];
+
+// Проверка наличия каталога dist
+if (!fs.existsSync(path.join(__dirname, 'dist'))) {
+  console.log('Каталог dist не найден. Создание базового HTML...');
+  fs.mkdirSync(path.join(__dirname, 'dist'), { recursive: true });
   
   const fallbackHtml = `
   <!DOCTYPE html>
@@ -72,27 +46,140 @@ try {
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Web Quest - Аварийный режим</title>
+      <title>Web Quest</title>
       <style>
-          body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-          .container { max-width: 800px; margin: 0 auto; }
+          body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #121212; color: #e0e0e0; }
+          .container { max-width: 800px; margin: 0 auto; background-color: #1e1e1e; padding: 20px; border-radius: 8px; }
+          h1 { color: #bb86fc; }
       </style>
   </head>
   <body>
       <div class="container">
           <h1>Web Quest</h1>
-          <p>Аварийный режим работы. Возникла проблема при запуске основного сервера.</p>
+          <p>Приложение запускается. Пожалуйста, соберите проект командой npm run build.</p>
       </div>
   </body>
   </html>
   `;
   
-  const server = http.createServer((req, res) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(fallbackHtml);
-  });
-  
-  server.listen(process.env.PORT || 3000, () => {
-    console.log('Аварийный сервер запущен на порту ' + (process.env.PORT || 3000));
-  });
+  fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), fallbackHtml);
 }
+
+// API Routes - Сообщения
+app.post('/api/messages', async (req, res) => {
+  try {
+    const message = req.body;
+    if (!message.text) {
+      return res.status(400).json({ error: 'Текст сообщения не может быть пустым' });
+    }
+    
+    let newMessage;
+    
+    if (mongoose && Message) {
+      // Если MongoDB доступна
+      newMessage = new Message({
+        text: message.text
+      });
+      await newMessage.save();
+    } else {
+      // Иначе используем in-memory
+      newMessage = {
+        id: Date.now(),
+        text: message.text,
+        createdAt: new Date()
+      };
+      messages.push(newMessage);
+    }
+    
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.error('Ошибка при создании сообщения:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+  }
+});
+
+app.get('/api/messages', async (req, res) => {
+  try {
+    let result;
+    
+    if (mongoose && Message) {
+      result = await Message.find().sort({ createdAt: -1 });
+    } else {
+      result = messages.sort((a, b) => b.createdAt - a.createdAt);
+    }
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Ошибка при получении сообщений:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+  }
+});
+
+// API Routes - Маркеры
+app.post('/api/markers', async (req, res) => {
+  try {
+    const { lat, lng, message } = req.body;
+    
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'Требуются координаты метки' });
+    }
+    
+    let newMarker;
+    
+    if (mongoose && Marker) {
+      // Если MongoDB доступна
+      newMarker = new Marker({
+        lat,
+        lng,
+        message: message || 'Новая метка'
+      });
+      await newMarker.save();
+    } else {
+      // Иначе используем in-memory
+      newMarker = {
+        id: Date.now(),
+        lat,
+        lng,
+        message: message || 'Новая метка',
+        createdAt: new Date()
+      };
+      markers.push(newMarker);
+    }
+    
+    res.status(201).json(newMarker);
+  } catch (error) {
+    console.error('Ошибка при создании метки:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+  }
+});
+
+app.get('/api/markers', async (req, res) => {
+  try {
+    let result;
+    
+    if (mongoose && Marker) {
+      result = await Marker.find().sort({ createdAt: -1 });
+    } else {
+      result = markers;
+    }
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Ошибка при получении меток:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+  }
+});
+
+// Обслуживаем статические файлы из папки dist
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Для всех оставшихся запросов возвращаем index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Запускаем сервер
+app.listen(port, () => {
+  console.log(`Web Quest сервер запущен на порту ${port}`);
+  console.log(`Открыть в браузере: http://localhost:${port}`);
+});

@@ -13,12 +13,28 @@ build/
 .env.test
 .env.production
 
+# Временные файлы
+.tmp/
+.temp/
+.cache/
+
+# Локальное хранилище данных (для тестирования без MongoDB)
+.local-data/
+
 # Logs
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Debug файлы
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Coverage отчеты
+coverage/
 
 # Editor directories and files
 .idea/
@@ -26,6 +42,14 @@ yarn-error.log*
 *.swp
 *.swo
 *.sublime-workspace
+# Дополнительные файлы редакторов
+*.launch
+*.sublime-project
+.history/
+.ionide/
+
+# Файлы локальных настроек
+.npmrc
 
 # OS generated files
 .DS_Store
@@ -35,3 +59,9 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+# Скрытые файлы Windows
+$RECYCLE.BIN/
+Desktop.ini
+
+# Webpack stats
+stats.json

@@ -2,28 +2,44 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'production', // Явно устанавливаем режим production
-  entry: './src/index.js', // Изменено с index.jsx на index.js для соответствия файлу
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  entry: './src/index.js',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    clean: true // Очистка папки dist перед сборкой
+    clean: true
   },
   resolve: { 
-    extensions: ['.js', '.jsx'],
-    // Добавим более строгое разрешение имен файлов
-    enforceExtension: false
+    extensions: ['.jsx', '.js']
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `npm.${packageName.replace('@', '')}`;
+          },
+        },
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true
+        },
+      },
+    },
+    runtimeChunk: 'single'
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/, // поддержка jsx
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'] // добавьте preset-react
-          }
+          loader: 'babel-loader'
         }
       },
       {
@@ -39,7 +55,19 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
-      filename: 'index.html'
+      filename: 'index.html',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      }
     })
   ],
   devServer: {
@@ -49,9 +77,15 @@ module.exports = {
     compress: true,
     port: 3000,
     hot: true,
-    // Перезагружать страницу при ошибках импорта
     client: {
       overlay: true
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:10000',
+        secure: false,
+        changeOrigin: true
+      }
     }
   }
 };
