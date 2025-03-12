@@ -9,7 +9,8 @@
     "dev:server": "nodemon server.js",
     "dev:client": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "clean": "rimraf dist node_modules"
+    "clean": "rimraf dist node_modules",
+    "vercel-build": "npm run build"
   },
   "author": "",
   "license": "MIT",

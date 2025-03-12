@@ -14,6 +14,7 @@ app.use(express.json());
 
 // Попытка подключения к MongoDB
 let mongoose, connectDB, Message, Marker;
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/web_quest';
 try {
   mongoose = require('mongoose');
   connectDB = require('./db/mongo');
